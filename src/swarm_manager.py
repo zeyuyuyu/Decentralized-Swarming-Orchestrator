@@ -1,99 +1,36 @@
-import asyncio
-from typing import Dict, List, Optional
-from dataclasses import dataclass
-import random
-
-@dataclass
-class SwarmNode:
-    id: str
-    capacity: float
-    current_load: float
-    tasks: List[str]
-    last_heartbeat: float
+import numpy as np
+from typing import List
 
 class SwarmManager:
-    def __init__(self):
-        self.nodes: Dict[str, SwarmNode] = {}
-        self.task_queue: List[str] = []
-        self.load_threshold = 0.8
+    def __init__(self, num_drones: int, arena_size: tuple):
+        self.num_drones = num_drones
+        self.arena_size = arena_size
+        self.drone_positions = np.random.uniform(0, arena_size, (num_drones, 2))
+        self.drone_velocities = np.random.uniform(-1, 1, (num_drones, 2))
 
-    async def register_node(self, node_id: str, capacity: float = 1.0) -> None:
-        """Register a new node in the swarm"""
-        self.nodes[node_id] = SwarmNode(
-            id=node_id,
-            capacity=capacity,
-            current_load=0.0,
-            tasks=[],
-            last_heartbeat=asyncio.get_event_loop().time()
-        )
+    def update_positions(self, dt: float):
+        self.drone_positions += self.drone_velocities * dt
+        self.drone_positions = np.clip(self.drone_positions, 0, self.arena_size)
 
-    async def schedule_task(self, task_id: str) -> Optional[str]:
-        """Schedule a task to the most suitable node using load balancing"""
-        if not self.nodes:
-            self.task_queue.append(task_id)
-            return None
+    def calculate_cohesion(self) -> np.ndarray:
+        centroid = np.mean(self.drone_positions, axis=0)
+        return centroid - self.drone_positions
 
-        # Find eligible nodes (not overloaded)
-        eligible_nodes = [
-            node for node in self.nodes.values()
-            if node.current_load < self.load_threshold * node.capacity
-        ]
+    def calculate_separation(self) -> np.ndarray:
+        distances = np.linalg.norm(self.drone_positions[:, None, :] - self.drone_positions[None, :, :], axis=-1)
+        repulsion = np.sum(self.drone_positions[:, None, :] - self.drone_positions[None, :, :] / (distances[:, :, None] ** 2 + 1e-6), axis=1)
+        return repulsion
 
-        if not eligible_nodes:
-            self.task_queue.append(task_id)
-            return None
+    def calculate_alignment(self) -> np.ndarray:
+        return np.mean(self.drone_velocities, axis=0) - self.drone_velocities
 
-        # Select node with lowest current load relative to capacity
-        selected_node = min(
-            eligible_nodes,
-            key=lambda n: n.current_load / n.capacity
-        )
+    def optimize_swarm(self):
+        cohesion = self.calculate_cohesion()
+        separation = self.calculate_separation()
+        alignment = self.calculate_alignment()
 
-        # Assign task
-        selected_node.tasks.append(task_id)
-        selected_node.current_load += 1.0 / selected_node.capacity
-        return selected_node.id
+        self.drone_velocities += cohesion * 0.1 + separation * 0.5 + alignment * 0.2
+        self.update_positions(0.1)
 
-    async def rebalance_tasks(self) -> None:
-        """Redistribute tasks among nodes for optimal load balance"""
-        if len(self.nodes) < 2:
-            return
-
-        # Find overloaded and underloaded nodes
-        overloaded = [n for n in self.nodes.values() 
-                     if n.current_load > self.load_threshold * n.capacity]
-        underloaded = [n for n in self.nodes.values()
-                      if n.current_load < self.load_threshold * n.capacity]
-
-        for source in overloaded:
-            while source.current_load > self.load_threshold * source.capacity:
-                if not underloaded:
-                    break
-                    
-                target = min(underloaded, 
-                            key=lambda n: n.current_load / n.capacity)
-                
-                # Move task from source to target
-                task = source.tasks.pop()
-                target.tasks.append(task)
-                source.current_load -= 1.0 / source.capacity
-                target.current_load += 1.0 / target.capacity
-
-    async def heartbeat(self, node_id: str) -> None:
-        """Update node's last heartbeat timestamp"""
-        if node_id in self.nodes:
-            self.nodes[node_id].last_heartbeat = \
-                asyncio.get_event_loop().time()
-
-    async def cleanup_dead_nodes(self, timeout: float = 30.0) -> None:
-        """Remove nodes that haven't sent heartbeat recently"""
-        current_time = asyncio.get_event_loop().time()
-        dead_nodes = [
-            node_id for node_id, node in self.nodes.items()
-            if current_time - node.last_heartbeat > timeout
-        ]
-
-        for node_id in dead_nodes:
-            node = self.nodes.pop(node_id)
-            # Requeue tasks from dead node
-            self.task_queue.extend(node.tasks)
+    def get_drone_positions(self) -> List[tuple]:
+        return [(x, y) for x, y in self.drone_positions]
