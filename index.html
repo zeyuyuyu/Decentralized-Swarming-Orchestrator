@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodMix - Your AI Music & Mood Journal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body class="bg-gradient-to-r from-purple-500 to-pink-500 min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Social Features Section -->
+        <div class="bg-white rounded-lg shadow-xl p-6 mb-8 animate__animated animate__fadeIn">
+            <h2 class="text-3xl font-bold mb-6 text-center text-purple-600">🎵 Your Mood Journey</h2>
+            
+            <!-- Mood Input -->
+            <div class="mood-input mb-8">
+                <div class="text-center mb-4">
+                    <div class="mood-emoji-selector flex justify-center gap-4">
+                        <button class="text-4xl hover:transform hover:scale-125 transition-transform" onclick="selectMood('😊')">😊</button>
+                        <button class="text-4xl hover:transform hover:scale-125 transition-transform" onclick="selectMood('😢')">😢</button>
+                        <button class="text-4xl hover:transform hover:scale-125 transition-transform" onclick="selectMood('😡')">😡</button>
+                        <button class="text-4xl hover:transform hover:scale-125 transition-transform" onclick="selectMood('🥰')">🥰</button>
+                        <button class="text-4xl hover:transform hover:scale-125 transition-transform" onclick="selectMood('😴')">😴</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Viral Social Features -->
+            <div class="social-features grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Mood Streaks -->
+                <div class="streak-card bg-gradient-to-r from-blue-100 to-purple-100 p-4 rounded-lg text-center">
+                    <h3 class="text-xl font-bold mb-2">🔥 Mood Streak</h3>
+                    <p class="text-4xl font-bold text-purple-600">7 Days</p>
+                    <p class="text-sm text-gray-600">Keep logging to maintain your streak!</p>
+                </div>
+
+                <!-- Friends Activity -->
+                <div class="friends-activity bg-gradient-to-r from-pink-100 to-red-100 p-4 rounded-lg">
+                    <h3 class="text-xl font-bold mb-2 text-center">👥 Friends' Moods</h3>
+                    <div class="friend-updates space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span>Sarah is feeling 🥰</span>
+                            <button class="text-purple-600 hover:text-purple-800">Send ❤️</button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Mike is feeling 😊</span>
+                            <button class="text-purple-600 hover:text-purple-800">Send ❤️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Challenges -->
+            <div class="challenges mt-8 bg-gradient-to-r from-yellow-100 to-orange-100 p-4 rounded-lg">
+                <h3 class="text-xl font-bold mb-4 text-center">🏆 Daily Challenge</h3>
+                <div class="challenge-card text-center">
+                    <p class="text-lg mb-2">"Share your mood with 3 friends"</p>
+                    <div class="progress-bar bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="bg-purple-600 h-full" style="width: 66%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">2/3 Complete - Reward: 50 Points!</p>
+                </div>
+            </div>
+
+            <!-- Mood Stats & Insights -->
+            <div class="stats-section mt-8">
+                <h3 class="text-xl font-bold mb-4 text-center">📊 Your Mood Stats</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="stat-card bg-white p-4 rounded-lg shadow text-center">
+                        <p class="text-sm text-gray-600">Weekly Happiness</p>
+                        <p class="text-2xl font-bold text-green-500">85%</p>
+                    </div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow text-center">
+                        <p class="text-sm text-gray-600">Mood Matches</p>
+                        <p class="text-2xl font-bold text-purple-500">24</p>
+                    </div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow text-center">
+                        <p class="text-sm text-gray-600">Song Discoveries</p>
+                        <p class="text-2xl font-bold text-blue-500">12</p>
+                    </div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow text-center">
+                        <p class="text-sm text-gray-600">Friend Reactions</p>
+                        <p class="text-2xl font-bold text-pink-500">156</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Section -->
+            <div class="share-section mt-8 text-center">
+                <button class="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition-colors inline-flex items-center gap-2">
+                    <span>Share Your Mood Journey</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectMood(emoji) {
+            // Animate the selection
+            const button = event.target;
+            button.classList.add('animate__animated', 'animate__pulse');
+            setTimeout(() => {
+                button.classList.remove('animate__animated', 'animate__pulse');
+            }, 1000);
+
+            // Show a celebratory message
+            const randomMessages = [
+                'Great choice! 🌟',
+                'Mood logged! Keep it up! ✨',
+                'You\'re on a roll! 🎯',
+                'Amazing streak! 🔥'
+            ];
+            alert(randomMessages[Math.floor(Math.random() * randomMessages.length)]);
+        }
+    </script>
+</body>
+</html>
